@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+<!-- Project Information -->
+  <groupId>alexandredureau</groupId>
+  <artifactId>jToolbox</artifactId>
+  <version>0.0</version>
+  <packaging>pom</packaging>
+  <description>Collection de classes Java</description>
+
+  <organization>
+    <name>alexandredureau</name>
+    <url>https://github.com/AlexandreDureau/</url>
+  </organization>
+
+<!-- Project Licenses -->
+  <licenses>
+    <license>
+      <name>Licence Enedis</name>
+      <url>LICENCE.txt</url>
+      <distribution>repo</distribution>
+      <comments>Licence propriétaire.</comments>
+    </license>
+  </licenses>
+
+<!-- Project Developers -->
+  <developers>
+    <developer>
+      <name>Alexandre Dureau</name>
+      <email></email>
+      <timezone>Europe/Paris</timezone>
+    </developer>
+  </developers>
+
+<!-- Project Mailing Lists -->
+  <mailingLists/>
+
+<!-- Project Source Control Management -->
+  <scm/>
+
+<!-- Project Issue Management -->
+  <issueManagement/>
+
+<!-- Project Continuous Integration Management -->
+  <ciManagement/>
+
+<!-- Project Distribution Management -->
+  <distributionManagement/>
+
+<!-- Project Dependencies -->
+  <dependencies/>
+
+<!-- Project Build -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.7.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
+    </plugins>
+  </build>
+
+<!-- Project Reporting -->
+  <reporting/>
+
+<!-- Project Profiles -->
+  <profiles/>
+
+<!-- Project Repositories -->
+  <repositories/>
+
+<!-- Project Plugin Repositories -->
+  <pluginRepositories/>
+
+</project>
