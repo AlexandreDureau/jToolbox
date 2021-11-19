@@ -1,81 +1,231 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!--
+  Copyright (C) Enedis.
+  All rights reserved.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-<!-- Project Information -->
-  <groupId>alexandredureau</groupId>
-  <artifactId>jToolbox</artifactId>
-  <version>0.0</version>
-  <packaging>pom</packaging>
-  <description>Collection de classes Java</description>
 
+  <!-- Project Information -->
+  <groupId>com.alexandredureau</groupId>
+  <artifactId>jToolbox</artifactId>
+  <version>00.01</version>
+  <packaging>jar</packaging>
+  <name>${project.artifactId}</name>
+  <description>
+    Collection of usefull classes for many purposes
+  </description>
   <organization>
-    <name>alexandredureau</name>
+    <name>Alexandre Dureau</name>
     <url>https://github.com/AlexandreDureau/</url>
   </organization>
 
-<!-- Project Licenses -->
+  <!-- Project Licenses -->
   <licenses>
     <license>
-      <name>Licence Enedis</name>
-      <url>LICENCE.txt</url>
+      <name>GNU GENERAL PUBLIC LICENSE v3</name>
+      <url>LICENCE.txt </url>
       <distribution>repo</distribution>
-      <comments>Licence propriétaire.</comments>
+      <comments/>
     </license>
   </licenses>
 
-<!-- Project Developers -->
+  <!-- Project Developers -->
   <developers>
     <developer>
-      <name>Alexandre Dureau</name>
-      <email></email>
+      <name>Alexandre DUREAU</name>
+      <email/>
+      <roles>
+        <role>Spécifieur</role>
+        <role>Architecte</role>
+        <role>Développeur</role>
+        <role>Testeur</role>
+      </roles>
       <timezone>Europe/Paris</timezone>
     </developer>
   </developers>
 
-<!-- Project Mailing Lists -->
+  <!-- Project Contributors -->
+  <contributors/>
+
+  <!-- Project Mailing Lists -->
   <mailingLists/>
 
-<!-- Project Source Control Management -->
+  <!-- Project Source Control Management -->
   <scm/>
 
-<!-- Project Issue Management -->
+  <!-- Project Issue Management -->
   <issueManagement/>
 
-<!-- Project Continuous Integration Management -->
+  <!-- Project Continuous Integration Management -->
   <ciManagement/>
 
-<!-- Project Distribution Management -->
+  <!-- Project Distribution Management -->
   <distributionManagement/>
 
-<!-- Project Dependencies -->
-  <dependencies/>
+  <!-- Project Properties -->
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project_basedir>${project.basedir}</project_basedir>
+    <project_groupId>${project.groupId}</project_groupId>
+    <project_artifactId>${project.artifactId}</project_artifactId>
+    <project_name>${project.name}</project_name>
+    <project_version>${project.version}</project_version>
+    <project_description>${project.description}</project_description>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
 
-<!-- Project Build -->
+  <!-- Project Dependencies -->
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.4.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.4.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>5.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- Project Build -->
   <build>
     <plugins>
+      <!-- Set used JRE version. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.8.2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>3.0.0</version>
       </plugin>
-    </plugins>
-  </build>
-
-<!-- Project Reporting -->
-  <reporting/>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>write-project-properties</goal>
+            </goals>
+            <configuration>
+              <outputFile>${project.basedir}/resources/project.properties</outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>make-bin-package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/assembly/bin.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-src-package</id>
+            <phase>site</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/assembly/src.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-doc-package</id>
+            <phase>site</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/assembly/doc.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+          <execution>
+            <id>make-complete-package</id>
+            <phase>site</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.basedir}/assembly/all.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Tests -->
+      <!--<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.1</version>
+      </plugin>
+</plugins>
+</build>
 
 <!-- Project Profiles -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <!-- Project Profiles -->
   <profiles/>
 
-<!-- Project Repositories -->
+  <!-- Project Repositories -->
   <repositories/>
 
-<!-- Project Plugin Repositories -->
+  <!-- Project Plugin Repositories -->
   <pluginRepositories/>
 
 </project>
