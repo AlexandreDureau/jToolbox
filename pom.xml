@@ -11,15 +11,15 @@
   <!-- Project Information -->
   <groupId>com.alexandredureau</groupId>
   <artifactId>jToolbox</artifactId>
-  <version>00.01</version>
+  <version>1.00-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
   <description>
     Collection of usefull classes for many purposes
   </description>
   <organization>
-    <name>Alexandre Dureau</name>
-    <url>https://github.com/AlexandreDureau/</url>
+    <name>AlexandreDureau</name>
+    <url>https://github.com/${project.organization.name}</url>
   </organization>
 
   <!-- Project Licenses -->
@@ -63,7 +63,13 @@
   <ciManagement/>
 
   <!-- Project Distribution Management -->
-  <distributionManagement/>
+  <distributionManagement>
+    <repository>
+      <id>internal.repo</id>
+      <name>Temporary Staging Repository</name>
+      <url>file://${project.build.directory}/mvn-artifact</url>
+    </repository>
+  </distributionManagement>
 
   <!-- Project Properties -->
   <properties>
@@ -111,8 +117,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>10</source>
+          <target>10</target>
         </configuration>
       </plugin>
       <plugin>
@@ -145,63 +151,62 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>make-bin-package</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>${project.basedir}/assembly/bin.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-          <execution>
-            <id>make-src-package</id>
-            <phase>site</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>${project.basedir}/assembly/src.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-          <execution>
-            <id>make-doc-package</id>
-            <phase>site</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>${project.basedir}/assembly/doc.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-          <execution>
-            <id>make-complete-package</id>
-            <phase>site</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>${project.basedir}/assembly/all.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <!-- Tests -->
-      <!--<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory> -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.1</version>
+      </plugin>
+      <!-- Deployment -->
+      <plugin>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8.2</version>
+        <configuration>
+          <altDeploymentRepository>
+            internal.repo::default::file://${project.build.directory}/mvn-artifact
+          </altDeploymentRepository>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Deploy the web site -->
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.12</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <!-- select the Maven phase in which the plugin will be executed -->
+            <phase>site-deploy</phase>
+            <configuration>
+              <!-- repository identification -->
+              <repositoryName>jToolbox</repositoryName>
+              <repositoryOwner>AlexandreDureau</repositoryOwner>
+              <server>github</server>
+              <!-- The commit message -->
+              <message>Building site for my project</message>
+              <!-- The location where the site is uploaded -->
+              <path>${site.path}</path>
+              <!-- Use merge or override the content -->
+              <merge>true</merge>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 </plugins>
 </build>
