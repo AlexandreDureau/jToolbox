@@ -37,12 +37,6 @@
     <developer>
       <name>Alexandre DUREAU</name>
       <email/>
-      <roles>
-        <role>Spécifieur</role>
-        <role>Architecte</role>
-        <role>Développeur</role>
-        <role>Testeur</role>
-      </roles>
       <timezone>Europe/Paris</timezone>
     </developer>
   </developers>
@@ -64,14 +58,14 @@
 
   <!-- Project Distribution Management -->
   <distributionManagement>
-    <repository>
-      <id>internal.repo</id>
-      <name>Temporary Staging Repository</name>
-      <url>file://${project.build.directory}/mvn-artifact</url>
-    </repository>
-  </distributionManagement>
+  <repository>
+    <id>github</id>
+    <name>{artifactId}</name>
+    <url>https://maven.pkg.github.com/{organization.name}/{artifactId}</url>
+  </repository>
+</distributionManagement>
 
-  <!-- Project Properties -->
+<!-- Project Properties -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
