@@ -18,6 +18,18 @@ public class ByteArray {
     // *****************************************************************************************************************
 
     /**
+     * Append an element to buffer
+     *
+     * @param buffer buffer of bytes
+     * @param element byte element
+     * @return buffer + element
+     */
+    public static byte[] s_append(byte[] buffer, byte element) {
+        return s_append(buffer, new byte[]{element});
+    }
+
+
+    /**
      * Append buffer_b to buffer_a and return the merged buffer
      *
      * @param buffer_a buffer of bytes
@@ -35,6 +47,18 @@ public class ByteArray {
         }
 
         return full_buffer;
+    }
+
+
+    /**
+     * Insert an element at the given index of the buffer
+     *
+     * @param buffer buffer of bytes
+     * @param element byte element
+     * @return the buffer with the element inserted at the given index
+     */
+    public static byte[] s_insert(int index, byte[] buffer, byte element) {
+        return s_insert(index, buffer, new byte[]{element});
     }
 
 
@@ -727,6 +751,16 @@ public class ByteArray {
 
 
     /**
+     * Append the given element to the instance
+     *
+     * @param element element to be appended
+     */
+    public void append(byte element) {
+        byteArray = s_append(byteArray, element);
+    }
+
+
+    /**
      * Append the given buffer to the instance
      *
      * @param buffer buffer to be appended
@@ -735,6 +769,18 @@ public class ByteArray {
         byteArray = s_append(byteArray, buffer);
     }
 
+
+
+    /**
+     * Insert the given element at the given index. If the index is negative or out of range, the element is appended to
+     * the instance
+     *
+     * @param index  index of the instance Where to insert element
+     * @param element element to insert
+     */
+    public void insert(int index, byte element) {
+        byteArray = s_insert(index, byteArray, element);
+    }
 
     /**
      * Insert the given buffer at the given index. If the index is negative or out of range, the buffer is appended to
