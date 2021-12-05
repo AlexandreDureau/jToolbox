@@ -60,8 +60,8 @@
   <distributionManagement>
   <repository>
     <id>github</id>
-    <name>{artifactId}</name>
-    <url>https://maven.pkg.github.com/{organization.name}/{artifactId}</url>
+    <name>jToolbox</name>
+    <url>https://maven.pkg.github.com/AlexandreDureau/jToolbox</url>
   </repository>
 </distributionManagement>
 
