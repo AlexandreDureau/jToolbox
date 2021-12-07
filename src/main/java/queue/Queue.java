@@ -1,386 +1,230 @@
-package toolbox.queue;
+package queue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import toolbox.constants.Time;
-import toolbox.log.Log;
+
+import static time.Constants.MILISECOND;
 
 public class Queue <type>
 {
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                            CONSTANTES
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	public static final boolean BUFFER_A = false;
 	public static final boolean BUFFER_B = true;
-	public static final int     dflt__UPDATE_PERIOD = (10 * Time.MILISECOND);
+	public static final int     DFLT_UPDATE_PERIOD = (10 * MILISECOND);
 
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                         MÉTHODES STATIQUES
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// vide
-	
-	
-	
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                          CONSTRUCTEUR(S)
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
-	/** ********************************************************************************************************************************************************
-	 * @brief  Constructeur
-	 *
-	 * @param  l__interface
-	 * @return
-	 * ****************************************************************************************************************************************************** */
-	public Queue(QueueInterface l__interface) 
+
+	protected List<type> bufferA;
+	protected List<type> bufferB;
+	protected List<type> queue;
+	protected int updatePeriod_ms;
+	protected boolean usedBuffer;
+	protected volatile boolean lock;
+	protected boolean isStarted;
+	protected Thread processingLoop;
+	protected QueueListener listener;
+
+
+	public Queue(QueueListener listener)
 	{
-		this.__init(l__interface);
+		this.init(listener);
 	}
-	
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                             INTERFACE
-	///                                                      xxxxxxxxxxxx_Interface
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// vide
-	
-	
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                         MÉTHODES ABSTRAITES
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// vide
-	
 
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                         MÉTHODES PUBLIQUES
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/** ********************************************************************************************************************************************************
-	 * @brief Démarre le processus de traitement de la file
-	 * 
-	 * ****************************************************************************************************************************************************** */
 	public void start()
 	{
-		if(false == a__Alive)
+		if(!isStarted)
 		{
-			this.__buildProcess();
-			this.__startProcess();
-		}
-		
-		else
-		{
-			// Aucune action
+			this.buildProcess();
+			this.startProcess();
 		}
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Arrête le processus de traitement de la file
-	 * 
-	 * ****************************************************************************************************************************************************** */
+
 	public void stop()
 	{
-		a__Alive = false;
+		isStarted = false;
 	}
-	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Deverrouille le traitement de la file
-	 *  
-	 * @param lock
-	 * ****************************************************************************************************************************************************** */
+
 	public void unlock()
 	{
 		this.lock(false);
 	}
-	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Verrouille le traitement de la file
-	 *  
-	 * @param lock
-	 * ****************************************************************************************************************************************************** */
+
 	public void lock()
 	{
 		this.lock(true);
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief (De)Verrouille le traitement de la file
-	 *  
-	 * @param lock
-	 * ****************************************************************************************************************************************************** */
+
 	public void lock(boolean lock)
 	{
-		a__Lock = lock;
+		this.lock = lock;
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Retourne la fréquence de mise à jour de la file
-	 *  
-	 * @return
-	 * ****************************************************************************************************************************************************** */
+
 	public int getUpdatePeriod()
 	{
-		return a__UpdatePeriod_ms;
+		return updatePeriod_ms;
 	}
-	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Renseigne la fréquence de mise à jour de la file
-	 *  
-	 * @param period
-	 * ****************************************************************************************************************************************************** */
+
+
 	public void setUpdatePeriod(int period)
 	{
 		if(period > 0)
 		{
-			a__UpdatePeriod_ms = period;
+			updatePeriod_ms = period;
 		}
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief 
-	 * 
-	 * @param entry
-	 * ****************************************************************************************************************************************************** */
+
 	public void push(type entry)
 	{
-		if(BUFFER_A == a__UsedBuffer)
+		if(BUFFER_A == usedBuffer)
 		{
-			a__BufferA.add(entry);
+			bufferA.add(entry);
 		}
 		
 		else
 		{
-			a__BufferB.add(entry);
+			bufferB.add(entry);
 		}
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief  Retire et retourne la première entrée de la file.
-	 * 
-	 * @return Premiere entrée de la file. 'null' si la file est vide
-	 * ****************************************************************************************************************************************************** */
-	public type pull()
+
+	public type pop()
 	{
 		type entry = null;
 		
-		if(false == a__EntriesList.isEmpty())
+		if(!queue.isEmpty())
 		{
-			entry = a__EntriesList.get(0);
-			a__EntriesList.remove(0);
+			entry = queue.get(0);
+			queue.remove(0);
 		}
-		
-		else
-		{
-			// Aucune action
-		}
-		
+
 		return entry;
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief  Purge la file.
-	 * 
-	 * ****************************************************************************************************************************************************** */
+
 	public void clear()
 	{
-		a__Lock = true;
-		a__EntriesList.clear();
-		a__Lock = false;
+		lock = true;
+		queue.clear();
+		lock = false;
 	}
 	
 	
 	public void clearBuffers()
 	{
-		a__Lock = true;
-		a__BufferA.clear();
-		a__BufferB.clear();
-		a__Lock = false;
+		lock = true;
+		bufferA.clear();
+		bufferB.clear();
+		lock = false;
 	}
 
 	
 	public void clearAll()
 	{
-		a__Lock = true;
-		a__EntriesList.clear();
-		a__BufferA.clear();
-		a__BufferB.clear();
-		a__Lock = false;
+		lock = true;
+		queue.clear();
+		bufferA.clear();
+		bufferB.clear();
+		lock = false;
 	}
 	
 	
 	public List<type> getBufferA()
 	{
-		return a__BufferA;
+		return bufferA;
 	}
 	
 	public List<type> getBufferB()
 	{
-		return a__BufferB;
+		return bufferB;
 	}
 	
-	public List<type> getEntriesList()
+	public List<type> getQueue()
 	{
-		return a__EntriesList;
+		return queue;
 	}
 	
 	
 	public type get(int index)
 	{
-		return a__EntriesList.get(index);
+		return queue.get(index);
 	}
 	
 	
 	public int indexOf(type entry)
 	{
-		return	a__EntriesList.indexOf(entry);
+		return	queue.indexOf(entry);
 	}
 
 	public void remove(type entry)
 	{
-		a__EntriesList.remove(entry);
+		queue.remove(entry);
 	}
 	
 	public void remove(int index)
 	{
-		a__EntriesList.remove(index);
+		queue.remove(index);
 	}
 	
 	public void removeAll(List<type> collection_list)
 	{
-		a__EntriesList.removeAll(collection_list);
+		queue.removeAll(collection_list);
 		
 	}
 
 
 	public boolean contains(type entry)
 	{
-		return a__EntriesList.contains(entry);
+		return queue.contains(entry);
 	}
-	
+
 
 	public boolean containsAll(List<type> collection_list)
 	{
-		return a__EntriesList.containsAll(collection_list);
+		return queue.containsAll(collection_list);
 	}
 
 	
 	public boolean isEmpty()
 	{
-		return a__EntriesList.isEmpty();
+		return queue.isEmpty();
 	}
 	
 	
 	public int size()
 	{
-		return a__EntriesList.size();
+		return queue.size();
 	}
 	
-	
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                         MÉTHODES PROTÉGÉES
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// vide
 
-	
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                         MÉTHODES PRIVÉES
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Initialise le processus
-	 * 
-	 * ****************************************************************************************************************************************************** */
-	private void __initProcess()
+
+	private void initProcess()
 	{
-		a__Alive = false;
-		a__ProcessingLoop = null;
+		isStarted = false;
+		processingLoop = null;
 	}
 	
 	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Bati le processus
-	 * 
-	 * ****************************************************************************************************************************************************** */
-	private void __buildProcess()
+
+	private void buildProcess()
 	{
-		a__ProcessingLoop = new Thread(new Runnable()
+		processingLoop = new Thread(new Runnable()
 		{
 			@Override public synchronized void run() 
 			{		
 				try
 				{						
-					// -----------------------------------------------------------------------------------------------------------------------------------------
-					// Processus :
-					// -----------------------------------------------------------------------------------------------------------------------------------------
-					while(true == a__Alive)
+					while(isStarted)
 					{
-//						if(false == a__Lock)
-//						{
-							__updateQueue();
-							
-							if(    (false == a__EntriesList.isEmpty())
-								&& (null != a__Interface))
-							{
-								a__Interface.onQueueUpdated(a__Instance);
-							}
-//						}
-//
-//						else
-//						{
-//							// Aucune action
-//						}	
+						update();
 
-						Thread.sleep(a__UpdatePeriod_ms);
+						if ((!queue.isEmpty()) && (null != listener)) {
+							listener.onQueueUpdated();
+						}
+
+						Thread.sleep(updatePeriod_ms);
 					}
 				}
 								
@@ -392,107 +236,54 @@ public class Queue <type>
 		});	
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Démarre le processus
-	 * 
-	 * ****************************************************************************************************************************************************** */
-	private void __startProcess()
+
+	private void startProcess()
 	{
-		a__Alive = true;
-		a__ProcessingLoop.start();
+		isStarted = true;
+		processingLoop.start();
 	}
 	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Bascule le buffer utilisé 
-	 * 
-	 * ****************************************************************************************************************************************************** */
-	private void __toggleBuffer()
+
+	private void toggleBuffer()
 	{
-		a__UsedBuffer = (BUFFER_A == a__UsedBuffer)? BUFFER_B 
-				                                   : BUFFER_A;
+		usedBuffer = (BUFFER_A == usedBuffer)? BUFFER_B : BUFFER_A;
 	}
-	 
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Met à jour si nécessaire la file à partir du buffer courant.
-	 *        Cette opération entraine alors le basculement de buffer ainsi que le vidage du buffer courant
-	 * 
-	 * ****************************************************************************************************************************************************** */
-	private void __updateQueue()
+
+
+	private void update()
 	{
 		// Buffer A
-		if(BUFFER_A == a__UsedBuffer)
+		if(BUFFER_A == usedBuffer)
 		{
-			if(false == a__BufferA.isEmpty())
+			if(!bufferA.isEmpty())
 			{
-				this.__toggleBuffer();
-				a__EntriesList.addAll(a__BufferA);
-				a__BufferA.clear();				
-			}
-			
-			else
-			{
-				// Aucune action
+				this.toggleBuffer();
+				queue.addAll(bufferA);
+				bufferA.clear();
 			}
 		}
 		
 		// Buffer B
 		else
 		{
-			if(false == a__BufferB.isEmpty())
+			if(!bufferB.isEmpty())
 			{
-				this.__toggleBuffer();
-				a__EntriesList.addAll(a__BufferB);
-				a__BufferB.clear();
-			}
-			
-			else
-			{
-				// Aucune action
+				this.toggleBuffer();
+				queue.addAll(bufferB);
+				bufferB.clear();
 			}
 		}
 	}
-	
-	
-	
-	/** ********************************************************************************************************************************************************
-	 * @brief Initialise l'instance
-	 * 
-	 * ****************************************************************************************************************************************************** */
-	private void __init(QueueInterface l__interface)
-	{
-		a__Lock = false;
-		a__Interface = l__interface;
-		a__UsedBuffer = BUFFER_A;
-		a__BufferA = new ArrayList<type>();
-		a__BufferB = new ArrayList<type>();
-		a__EntriesList = new ArrayList<type>();
-		a__Instance = this;
 
-		this.__initProcess();
+	private void init(QueueListener listener)
+	{
+		lock = false;
+		this.listener = listener;
+		usedBuffer = BUFFER_A;
+		bufferA = new ArrayList<type>();
+		bufferB = new ArrayList<type>();
+		queue = new ArrayList<type>();
+
+		this.initProcess();
 	}
-	
-	
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	///
-	///
-	///                                                            ATTRIBUTS
-	///
-	///
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
-	protected Queue<type>      a__Instance;
-	protected List<type>       a__BufferA;
-	protected List<type>       a__BufferB;
-	protected List<type>       a__EntriesList;
-	protected int              a__UpdatePeriod_ms;
-	protected boolean          a__UsedBuffer;
-	protected volatile boolean a__Lock;
-	protected boolean          a__Alive;
-	protected Thread           a__ProcessingLoop;
-	protected QueueInterface   a__Interface;
 }

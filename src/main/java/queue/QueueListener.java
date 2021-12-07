@@ -1,7 +1,7 @@
 package queue;
 
 
-public interface QueueInterface<type>
+public interface QueueListener<type>
 {
-	public void onQueueUpdated(Queue<type> queue);
+	public void onQueueUpdated();
 }
