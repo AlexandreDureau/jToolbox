@@ -673,6 +673,22 @@ public class ByteArrayTest {
     //
     // *****************************************************************************************************************
 
+
+    @Test
+    public void method_clear_shall_make_the_ByteArray_empty(){
+        // Given
+        ByteArray byteArray = new ByteArray(new byte[] {'a','b','c','d','e','f','g','h','i','j','k','l'});
+
+        // When:
+        byteArray.clear();
+
+        // Then:
+        byte[] expected_bytes = {};
+        Assertions.assertArrayEquals(expected_bytes, byteArray.getBytes());
+
+    }
+
+
     @Test
     public void method_getBytes_shall_return_the_bytes_of_a_ByteArray(){
 

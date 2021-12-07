@@ -718,6 +718,11 @@ public class ByteArray {
     }
 
 
+    public void clear(){
+        byteArray = new byte[]{};
+    }
+
+
     /**
      * Instantiates a new Byte array.
      *

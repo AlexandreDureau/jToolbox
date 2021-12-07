@@ -11,7 +11,7 @@
   <!-- Project Information -->
   <groupId>com.alexandredureau</groupId>
   <artifactId>jToolbox</artifactId>
-  <version>1.00-SNAPSHOT</version>
+  <version>v0.0.4-alpha</version>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
   <description>
