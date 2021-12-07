@@ -190,6 +190,27 @@ public class ByteArrayTest {
     }
 
     @Test
+    public void static_method_removeAt_shall_remove_from_the_buffer_the_element_at_the_given_index(){
+
+        // Given:
+        byte[] buffer_a = {'c','a','b','a','b','a','b','a','c','a','b','a','l'};
+
+        // When:
+        byte[] buffer1 = ByteArray.s_removeAt(buffer_a, 6);
+        byte[] buffer2 = ByteArray.s_removeAt(buffer_a, 0);
+        byte[] buffer3 = ByteArray.s_removeAt(buffer_a, buffer_a.length-1);
+
+        // Then:
+        byte[] expected_buffer1 = {'c','a','b','a','b','a','a','c','a','b','a','l'};
+        byte[] expected_buffer2 = {'a','b','a','b','a','b','a','c','a','b','a','l'};
+        byte[] expected_buffer3 = {'c','a','b','a','b','a','b','a','c','a','b','a'};
+
+        Assertions.assertArrayEquals(expected_buffer1, buffer1);
+        Assertions.assertArrayEquals(expected_buffer2, buffer2);
+        Assertions.assertArrayEquals(expected_buffer3, buffer3);
+    }
+
+    @Test
     public void static_method_remove_shall_remove_a_pattern_from_a_buffer(){
 
         // Given:
@@ -796,6 +817,21 @@ public class ByteArrayTest {
 
         // Then:
         Assertions.assertEquals(2, nb_of_remove);
+        Assertions.assertArrayEquals(expected_bytes, byteArray.getBytes());
+    }
+
+    @Test
+    public void method_removeAt_shall_remove_the_element_at_the_given_index_from_the_buffer(){
+
+        // Given
+        ByteArray byteArray = new ByteArray(new byte[]{'c','r','b','a','t','n','m','s','c','d','e','k','l'});
+
+        // When:
+        byte element1 = byteArray.removeAt(7);
+
+        // Then:
+        byte[] expected_bytes = {'c','r','b','a','t','n','m','c','d','e','k','l'};
+        Assertions.assertEquals('s', element1);
         Assertions.assertArrayEquals(expected_bytes, byteArray.getBytes());
     }
 
