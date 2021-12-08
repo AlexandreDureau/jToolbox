@@ -18,7 +18,7 @@ public class Queue <type>
 	protected List<type> queue;
 	protected int updatePeriod_ms;
 	protected boolean usedBuffer;
-	protected volatile boolean lock;
+	protected volatile boolean isLocked;
 	protected boolean isStarted;
 	protected Thread processingLoop;
 	protected QueueListener listener;
@@ -44,6 +44,7 @@ public class Queue <type>
 		isStarted = false;
 	}
 
+
 	public void unlock()
 	{
 		this.lock(false);
@@ -57,7 +58,7 @@ public class Queue <type>
 
 	public void lock(boolean lock)
 	{
-		this.lock = lock;
+		this.isLocked = lock;
 	}
 	
 
@@ -82,7 +83,6 @@ public class Queue <type>
 		{
 			bufferA.add(entry);
 		}
-		
 		else
 		{
 			bufferB.add(entry);
@@ -106,28 +106,28 @@ public class Queue <type>
 
 	public void clear()
 	{
-		lock = true;
+		isLocked = true;
 		queue.clear();
-		lock = false;
+		isLocked = false;
 	}
 	
 	
 	public void clearBuffers()
 	{
-		lock = true;
+		isLocked = true;
 		bufferA.clear();
 		bufferB.clear();
-		lock = false;
+		isLocked = false;
 	}
 
 	
 	public void clearAll()
 	{
-		lock = true;
+		isLocked = true;
 		queue.clear();
 		bufferA.clear();
 		bufferB.clear();
-		lock = false;
+		isLocked = false;
 	}
 	
 	
@@ -135,12 +135,14 @@ public class Queue <type>
 	{
 		return bufferA;
 	}
-	
+
+
 	public List<type> getBufferB()
 	{
 		return bufferB;
 	}
-	
+
+
 	public List<type> getQueue()
 	{
 		return queue;
@@ -158,16 +160,19 @@ public class Queue <type>
 		return	queue.indexOf(entry);
 	}
 
+
 	public void remove(type entry)
 	{
 		queue.remove(entry);
 	}
-	
+
+
 	public void remove(int index)
 	{
 		queue.remove(index);
 	}
-	
+
+
 	public void removeAll(List<type> collection_list)
 	{
 		queue.removeAll(collection_list);
@@ -206,7 +211,6 @@ public class Queue <type>
 		processingLoop = null;
 	}
 	
-	
 
 	private void buildProcess()
 	{
@@ -218,10 +222,12 @@ public class Queue <type>
 				{						
 					while(isStarted)
 					{
-						update();
+						if(!isLocked){
+							update();
 
-						if ((!queue.isEmpty()) && (null != listener)) {
-							listener.onQueueUpdated();
+							if ((!queue.isEmpty()) && (null != listener)) {
+								listener.onQueueUpdated();
+							}
 						}
 
 						Thread.sleep(updatePeriod_ms);
@@ -277,7 +283,7 @@ public class Queue <type>
 
 	private void init(QueueListener listener)
 	{
-		lock = false;
+		isLocked = false;
 		this.listener = listener;
 		usedBuffer = BUFFER_A;
 		bufferA = new ArrayList<type>();
