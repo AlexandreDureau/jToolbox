@@ -1,0 +1,110 @@
+{
+  "title": "human resources infos",
+  "confidential" : true,
+  "accounting" : [
+    {
+      "firstName" : "John",
+      "lastName"  : "Doe",
+      "age"       : 23,
+      "weight"    : 160.4,
+      "nice"      : true,
+      "friends"   : [
+        "Albert",
+        "Mary",
+        "Paul"
+      ],
+      "additionalInfo" : {
+        "favoriteSinger": "Phill Collins",
+        "totalAmountOfMoney" : 77288.2,
+        "presenceLastWeek": {
+          "Monday"   : true,
+          "Tuesday"  : true,
+          "Wednesday": true,
+          "Thursday" : true,
+          "Friday"   : true,
+          "Saturday" : false,
+          "Sunday"   : false
+        }
+      }
+    },
+    {
+      "firstName" : "Mary",
+      "lastName"  : "Smith",
+      "age"       : 32,
+      "weight"    : 144.7,
+      "nice"      : false,
+      "friends"   : [
+        "Lucy",
+        "Jenny",
+        "Paul"
+      ],
+      "additionalInfo" : {
+        "favoriteSinger": "Madonna",
+        "totalAmountOfMoney" : 34210.9,
+        "presenceLastWeek": {
+          "Monday"   : true,
+          "Tuesday"  : true,
+          "Wednesday": false,
+          "Thursday" : true,
+          "Friday"   : false,
+          "Saturday" : false,
+          "Sunday"   : false
+        }
+      }
+    }
+  ],
+  "sales"      : [
+    {
+      "firstName" : "Sally",
+      "lastName"  : "Green",
+      "age"       : 27,
+      "weight"    : 131.1,
+      "nice"      : true,
+      "friends"   : [
+        "Melany",
+        "Ludivine",
+        "Hannah"
+      ],
+      "additionalInfo" : {
+        "favoriteSinger": "Michel Delpech",
+        "totalAmountOfMoney" : 121.8,
+        "presenceLastWeek": {
+          "Monday"   : true,
+          "Tuesday"  : false,
+          "Wednesday": false,
+          "Thursday" : false,
+          "Friday"   : false,
+          "Saturday" : false,
+          "Sunday"   : false
+        }
+      }
+    },
+    {
+      "firstName" : "Jim",
+      "lastName"  : "Galley",
+      "age"       : 41,
+      "weight"    : 185.6,
+      "nice"      : false,
+      "friends"   : [],
+      "additionalInfo" : {
+        "favoriteSinger": "Dave",
+        "totalAmountOfMoney" : 4509.0,
+        "presenceLastWeek": {
+          "Monday"   : true,
+          "Tuesday"  : true,
+          "Wednesday": false,
+          "Thursday" : false,
+          "Friday"   : true,
+          "Saturday" : true,
+          "Sunday"   : false
+        }
+      }
+    }
+  ],
+  "bossHappinessMatrix": [
+    [true,  false, true, false],
+    [false, false, true, false],
+    [false, true,  true, true],
+    [true,  true,  true, false]
+  ]
+}

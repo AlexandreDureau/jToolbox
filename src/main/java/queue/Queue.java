@@ -219,13 +219,14 @@ public class Queue <type>
 			@Override public synchronized void run() 
 			{		
 				try
-				{						
+				{
 					while(isStarted)
 					{
 						if(!isLocked){
 							update();
 
 							if ((!queue.isEmpty()) && (null != listener)) {
+
 								listener.onQueueUpdated();
 							}
 						}
@@ -289,7 +290,7 @@ public class Queue <type>
 		bufferA = new ArrayList<type>();
 		bufferB = new ArrayList<type>();
 		queue = new ArrayList<type>();
-
+		updatePeriod_ms = DFLT_UPDATE_PERIOD;
 		this.initProcess();
 	}
 }

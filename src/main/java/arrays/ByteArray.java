@@ -9,13 +9,33 @@ import static arrays.Type.LAZY;
 
 public class ByteArray {
 
-    protected byte[] byteArray;
+    protected byte[] byteArray = new byte[0];
 
     // *****************************************************************************************************************
     //
     //  STATIC METHODS
     //
     // *****************************************************************************************************************
+
+
+    public static byte[] toBytes(char[] data) {
+        byte[] bytesData = new byte[data.length];
+
+        for(int i = 0; i < bytesData.length; i++) {
+            bytesData[i] = (byte) data[i];
+        }
+        return bytesData;
+    }
+
+
+    public static char[] toChars(byte[] data) {
+        char[] charData = new char[data.length];
+
+        for(int i = 0; i < charData.length; i++) {
+            charData[i] = (char) data[i];
+        }
+        return charData;
+    }
 
     /**
      * Append an element to buffer
@@ -33,7 +53,7 @@ public class ByteArray {
      * Append buffer_b to buffer_a and return the merged buffer
      *
      * @param buffer_a buffer of bytes
-     * @param buffer_b buffer of bytes to append 'buffer_a'
+     * @param buffer_b buffer of bytes to append to 'buffer_a'
      * @return buffer_a + buffer_b
      */
     public static byte[] s_append(byte[] buffer_a, byte[] buffer_b) {
@@ -94,6 +114,7 @@ public class ByteArray {
 
         return full_buffer;
     }
+
 
     /**
      * Return the number of iterations of 'pattern' in buffer.
@@ -390,12 +411,16 @@ public class ByteArray {
 
                 for (int i = 0; i < (result_buffer.length); i++) {
 
-                    int pattern_end = pattern_indexes.get(nb_patterns_removed) + pattern.length - 1;
                     if (!isPattern(i, pattern_indexes, pattern.length) || (nb_patterns_removed >= nb_patterns)) {
                         result_buffer[k] = result_buffer[i];
                         k++;
-                    } else if (i >= pattern_end) {
-                        nb_patterns_removed++;
+                    }
+                    else{
+                        int pattern_end = pattern_indexes.get(nb_patterns_removed) + pattern.length - 1;
+
+                        if (i >= pattern_end) {
+                            nb_patterns_removed++;
+                        }
                     }
                 }
 
@@ -517,6 +542,11 @@ public class ByteArray {
         List<Integer> separators_indexes = s_beginningIndexesOf(buffer, separator);
         List<Integer> parts_indexes;
 
+        if(0 == separators_indexes.size()){
+            byte_table.add(new ByteArray(buffer));
+            return  byte_table;
+        }
+
         if (separators_indexes.size() >= max_parts) {
             parts_indexes = separators_indexes.subList(0, max_parts - 1);
         } else {
@@ -575,11 +605,30 @@ public class ByteArray {
      * @return parts extracted from buffer. If start and end patterns have not been found, the list contains only one element which is the buffer itself
      */
     public static List<ByteArray> s_split(byte[] buffer, byte[] start_pattern, byte[] end_pattern, boolean include_keys, int max_parts) {
-        List<ByteArray> byte_table = new ArrayList<ByteArray>();
+        List<ByteArray> byte_array_list = new ArrayList<ByteArray>();
 
-        // TODO
-        return byte_table;
+        List<Integer> startIndexes = s_beginningIndexesOf(buffer,start_pattern);
+        List<Integer> endIndexes = s_endIndexesOf(buffer,end_pattern);
+
+        int startIndex = -1;
+        for (Integer start : startIndexes) {
+            int endIndex = startIndex;
+            for (Integer e : endIndexes) {
+                if(e > start) {
+                    startIndex = start;
+                    endIndex = e;
+                    break;
+                }
+            }
+
+            if(endIndex > startIndex){
+                byte_array_list.add(new ByteArray(s_copy(buffer,startIndex,endIndex)));
+            }
+        }
+
+        return byte_array_list;
     }
+
 
     public static byte[] s_copy(byte[] buffer, int start, int end) {
 
@@ -971,6 +1020,19 @@ public class ByteArray {
 
 
     /**
+     *
+     * @param start_pattern
+     * @param end_pattern
+     * @param include_keys
+     * @param max_parts
+     * @return
+     */
+    public List<ByteArray> split( byte[] start_pattern, byte[] end_pattern, boolean include_keys, int max_parts) {
+        return s_split(byteArray, start_pattern, end_pattern, include_keys, max_parts);
+    }
+
+
+    /**
      * Give the index of the first iteration of 'key' in buffer. Return -1 if not found
      *
      * @param key key byte
@@ -1050,4 +1112,27 @@ public class ByteArray {
     }
 
 
+    @Override
+    public String toString() {
+        return new String(byteArray);
+    }
+
+    public String toString(int base){
+        StringBuilder str = new StringBuilder();
+
+        if(16 == base){
+            for (byte b : byteArray) {
+                String hexChar = Integer.toHexString(b);
+
+                if (hexChar.length() > 1) {
+                    str.append(hexChar);
+                } else {
+                    str.append("0").append(hexChar);
+                }
+
+            }
+        }
+
+        return str.toString();
+    }
 }

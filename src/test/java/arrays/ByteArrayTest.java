@@ -688,6 +688,29 @@ public class ByteArrayTest {
         Assertions.assertArrayEquals(expectedPart4, parts.get(3).getBytes());
     }
 
+
+    @Test
+    public void static_method_split_shall_return_the_parts_of_a_splitted_buffer_(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','b','c','g','h','u','i','j','b','c','h','i','j','k','l'};
+        byte[] start_pattern = {'b','c'};
+        byte[] end_pattern   = {'i','j'};
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, true, -1);
+
+        // Then:
+        byte[] expectedPart1 = {'b','c','d','b','e','f','g','i','j'};
+        byte[] expectedPart2 = {'b','c','g','h','u','i','j'};
+        byte[] expectedPart3 = {'b','c','h','i','j'};
+
+        Assertions.assertEquals(3, parts.size());
+        Assertions.assertArrayEquals(expectedPart1, parts.get(0).getBytes());
+        Assertions.assertArrayEquals(expectedPart2, parts.get(1).getBytes());
+        Assertions.assertArrayEquals(expectedPart3, parts.get(2).getBytes());
+    }
+
+
     // *****************************************************************************************************************
     //
     //  METHODS TESTS
