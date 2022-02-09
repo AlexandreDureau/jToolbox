@@ -516,7 +516,7 @@ public class ByteArray {
 
 
     /**
-     * Split a buffer of bytes in a list of ByteArray instances, given a separator. a maximum of parts can be defined
+     * Split a buffer of bytes in a list of ByteArray instances, given a byte separator. a maximum number of parts can be defined
      *
      * @param buffer    buffer to split
      * @param separator separator byte
@@ -529,7 +529,7 @@ public class ByteArray {
 
 
     /**
-     * Split a buffer of bytes in a list of ByteArray instances, given a separator. a maximum of parts can be defined
+     * Split a buffer of bytes in a list of ByteArray instances, given a byte[] separator. a maximum number of parts can be defined
      *
      * @param buffer    buffer to split
      * @param separator separator pattern
@@ -578,8 +578,166 @@ public class ByteArray {
     }
 
     /**
+     * Split a buffer of bytes in a list of ByteArray instances, given a 'start' and 'end' byte separators.
+     * A maximum number of parts can be defined
+     *
+     * For example :
+     * - buffer is ['0','1','2','A','B','C','D','3','4','A','E','F','D','A','D','8','9']
+     * - start_key is 'A'
+     * - end_key is 'D'
+     * - max_parts is -1 (full split)
+     *
+     * the return list of ByteArray will be :
+     *  {
+     *      ['0','1','2'],
+     *      ['A','B','C','D'],
+     *      ['3','4'],
+     *      ['A','E','F','D'],
+     *      ['A','D'],
+     *      ['8','9']
+     *  }
+     *
+     * @param buffer       buffer
+     * @param start_key    key byte indicating the beginning of a part
+     * @param end_key      key byte indicating the end of a part
+     * @param max_parts    maximum number of parts to extract (-1 to extract all parts)
+     * @return parts extracted from buffer. If start and end keys have not been found, the list contains only one element which is the buffer itself
+     */
+    public static List<ByteArray> s_split(byte[] buffer, byte start_key, byte end_key, int max_parts) {
+        return s_split(buffer, new byte[]{start_key}, new byte[]{end_key}, max_parts);
+    }
+
+
+    /**
+     * Split a buffer of bytes in a list of ByteArray instances, given 'start' and 'end' patterns.
+     * A maximum number of parts can be defined
+     *
+     * For example :
+     * - buffer is ['0','1','2','A','B','C','D','3','4','A','E','F','D','A','D','8','9']
+     * - start_pattern is ['A','B']
+     * - end_pattern is ['F','D']
+     * - max_parts is -1 (full split)
+     *
+     * the return list of ByteArray will be :
+     *  {
+     *      ['0','1','2'],
+     *      ['A','B','C','D','3','4','A','E','F','D'],
+     *      ['A','D','8','9']
+     *  }
+     *
+     * @param buffer        buffer
+     * @param start_pattern pattern indicating the beginning of a part
+     * @param end_pattern pattern indicating the end of a part
+     * @param max_parts     maximum number of parts to extract (-1 to extract all parts)
+     * @return parts extracted from buffer. If start and end keys have not been found, the list contains only one element which is the buffer itself
+     */
+    public static List<ByteArray> s_split(byte[] buffer, byte[] start_pattern, byte[] end_pattern, int max_parts) {
+        List<ByteArray> byte_array_list = new ArrayList<ByteArray>();
+
+        List<Integer> startIndexes = s_beginningIndexesOf(buffer,start_pattern);
+        List<Integer> endIndexes = s_endIndexesOf(buffer,end_pattern);
+
+        if(!isOnlyOnePart(startIndexes,endIndexes,max_parts)){
+            int current_index = 0;
+            int i = 0;
+            for (Integer start_index : startIndexes) {
+
+                if(i < endIndexes.size()){
+                    if(start_index > current_index){
+                        if(byte_array_list.size() == max_parts - 1){
+                            byte_array_list.add(new ByteArray(Arrays.copyOfRange(buffer,current_index,buffer.length)));
+                            current_index = buffer.length;
+                            break;
+                        }
+                        else{
+                            byte_array_list.add(new ByteArray(Arrays.copyOfRange(buffer,current_index,start_index)));
+                        }
+
+                        current_index = start_index;
+                    }
+
+                    int endIndex = buffer.length;
+
+                    for(Integer end_index : endIndexes) {
+                        if(end_index > start_index){
+                            endIndex = end_index;
+                            break;
+                        }
+                    }
+
+                    if(byte_array_list.size() == max_parts - 1){
+                        byte_array_list.add(new ByteArray(Arrays.copyOfRange(buffer,current_index,buffer.length)));
+                        current_index = buffer.length;
+                        break;
+                    }
+                    else{
+                        byte_array_list.add(new ByteArray(Arrays.copyOfRange(buffer,start_index,endIndex+1)));
+                    }
+
+                    current_index = endIndex+1;
+
+                }
+                // S'il n'y a plus d'index de fin :
+                else{
+                    byte_array_list.add(new ByteArray(Arrays.copyOfRange(buffer,current_index,buffer.length)));
+                    current_index = buffer.length;
+                    break;
+                }
+
+                i++;
+            }
+
+            // S'il y a un reliquat :
+            if(current_index < buffer.length){
+                byte_array_list.add(new ByteArray(Arrays.copyOfRange(buffer,current_index,buffer.length)));
+            }
+        }
+        else{
+            byte_array_list.add(new ByteArray(buffer));
+        }
+
+        return byte_array_list;
+    }
+
+
+    protected static boolean isOnlyOnePart(List<Integer> startIndexes, List<Integer> endIndexes, int maxParts){
+        if(maxParts != 1){
+            if(startIndexes.size() > 0 && endIndexes.size() > 0){
+                int minStartIndex = Integer.MAX_VALUE;
+                int maxEndIndex = 0;
+
+                for(Integer startIndex : startIndexes){
+                    if(startIndex < minStartIndex){
+                        minStartIndex = startIndex;
+                    }
+                }
+
+                for(Integer endIndex : endIndexes){
+                    if(endIndex > maxEndIndex){
+                        maxEndIndex = endIndex;
+                    }
+                }
+
+                if(minStartIndex < maxEndIndex){
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
+            else{
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+    }
+
+
+    /**
      * From a given buffer of bytes, extract parts starting and ending with given keys. The number of parts can be
-     * limited
+     * limited and keys can be included or not
      *
      * @param buffer       buffer
      * @param start_key    key byte indicating the beginning of a part
@@ -588,8 +746,8 @@ public class ByteArray {
      * @param max_parts    maximum number of parts to extract (-1 to extract all parts)
      * @return parts extracted from buffer. If start and end keys have not been found, the list contains only one element which is the buffer itself
      */
-    public static List<ByteArray> s_split(byte[] buffer, byte start_key, byte end_key, boolean include_keys, int max_parts) {
-        return s_split(buffer, new byte[]{start_key}, new byte[]{end_key}, include_keys, max_parts);
+    public static List<ByteArray> s_extract(byte[] buffer, byte start_key, byte end_key, boolean include_keys, int max_parts) {
+        return s_extract(buffer, new byte[]{start_key}, new byte[]{end_key}, include_keys, max_parts);
     }
 
 
@@ -604,7 +762,7 @@ public class ByteArray {
      * @param max_parts     maximum number of parts to extract (-1 to extract all parts)
      * @return parts extracted from buffer. If start and end patterns have not been found, the list contains only one element which is the buffer itself
      */
-    public static List<ByteArray> s_split(byte[] buffer, byte[] start_pattern, byte[] end_pattern, boolean include_keys, int max_parts) {
+    public static List<ByteArray> s_extract(byte[] buffer, byte[] start_pattern, byte[] end_pattern, boolean include_keys, int max_parts) {
         List<ByteArray> byte_array_list = new ArrayList<ByteArray>();
 
         List<Integer> startIndexes = s_beginningIndexesOf(buffer,start_pattern);
@@ -1005,8 +1163,8 @@ public class ByteArray {
 
 
     /**
-     * Split the instance in parts starting and ending with respective keys. The number of parts can be
-     * limited
+     * Extract from the instance the parts starting and ending with respective keys. The number of parts to extract
+     * can be limited
      *
      * @param begin_key    key byte indicating the beginning of a part
      * @param end_key      key byte indicating the end of a part
@@ -1014,12 +1172,14 @@ public class ByteArray {
      * @param max_parts    maximum number of parts to extract (-1 to extract all parts)
      * @return list
      */
-    public List<ByteArray> split(byte begin_key, byte end_key, boolean include_keys, int max_parts) {
-        return s_split(byteArray, begin_key, end_key, include_keys, max_parts);
+    public List<ByteArray> extract(byte begin_key, byte end_key, boolean include_keys, int max_parts) {
+        return s_extract(byteArray, begin_key, end_key, include_keys, max_parts);
     }
 
 
     /**
+     * Extract from the instance the parts starting and ending with respective patterns. The number of parts to extract
+     * can be limited
      *
      * @param start_pattern
      * @param end_pattern
@@ -1027,8 +1187,8 @@ public class ByteArray {
      * @param max_parts
      * @return
      */
-    public List<ByteArray> split( byte[] start_pattern, byte[] end_pattern, boolean include_keys, int max_parts) {
-        return s_split(byteArray, start_pattern, end_pattern, include_keys, max_parts);
+    public List<ByteArray> extract( byte[] start_pattern, byte[] end_pattern, boolean include_keys, int max_parts) {
+        return s_extract(byteArray, start_pattern, end_pattern, include_keys, max_parts);
     }
 
 

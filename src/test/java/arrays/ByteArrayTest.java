@@ -690,14 +690,14 @@ public class ByteArrayTest {
 
 
     @Test
-    public void static_method_split_shall_return_the_parts_of_a_splitted_buffer_(){
+    public void static_method_extract_shall_extract_the_parts_from_the_buffer_(){
 
         // Given:
         byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','b','c','g','h','u','i','j','b','c','h','i','j','k','l'};
         byte[] start_pattern = {'b','c'};
         byte[] end_pattern   = {'i','j'};
         // When:
-        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, true, -1);
+        List<ByteArray> parts = ByteArray.s_extract(buffer, start_pattern, end_pattern, true, -1);
 
         // Then:
         byte[] expectedPart1 = {'b','c','d','b','e','f','g','i','j'};
@@ -710,6 +710,137 @@ public class ByteArrayTest {
         Assertions.assertArrayEquals(expectedPart3, parts.get(2).getBytes());
     }
 
+
+
+    @Test
+    public void static_method_split_shall_split_a_buffer_given_start_and_end_patterns(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'};
+        byte[] start_pattern = {'b','c'};
+        byte[] end_pattern   = {'i','j'};
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, -1);
+
+        // Then:
+        byte[] expectedPart1 = {'a'};
+        byte[] expectedPart2 = {'b','c','d','b','e','f','g','i','j'};
+        byte[] expectedPart3 = {'0','1','2'};
+        byte[] expectedPart4 = {'b','c','g','h','u','i','j'};
+        byte[] expectedPart5 = {'b','c','4','i','j'};
+        byte[] expectedPart6 = {'k','l'};
+
+        Assertions.assertEquals(6, parts.size());
+        Assertions.assertArrayEquals(expectedPart1, parts.get(0).getBytes());
+        Assertions.assertArrayEquals(expectedPart2, parts.get(1).getBytes());
+        Assertions.assertArrayEquals(expectedPart3, parts.get(2).getBytes());
+        Assertions.assertArrayEquals(expectedPart4, parts.get(3).getBytes());
+        Assertions.assertArrayEquals(expectedPart5, parts.get(4).getBytes());
+        Assertions.assertArrayEquals(expectedPart6, parts.get(5).getBytes());
+    }
+
+
+    @Test
+    public void static_method_split_shall_split_a_buffer_in_the_given_number_of_parts_according_start_and_end_patterns(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'};
+        byte[] start_pattern = {'b','c'};
+        byte[] end_pattern   = {'i','j'};
+
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, 3);
+
+        // Then:
+        Assertions.assertEquals(3, parts.size());
+        Assertions.assertArrayEquals(new byte[] {'a'}, parts.get(0).getBytes());
+        Assertions.assertArrayEquals(new byte[] {'b','c','d','b','e','f','g','i','j'}, parts.get(1).getBytes());
+        Assertions.assertArrayEquals(new byte[] {'0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'}, parts.get(2).getBytes());
+    }
+
+    @Test
+    public void static_method_split_shall_return_the_entire_buffer_if_given_number_of_parts_is_set_to_one(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'};
+        byte[] start_pattern = {'b','c'};
+        byte[] end_pattern   = {'i','j'};
+
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, 1);
+
+        // Then:
+        Assertions.assertEquals(1, parts.size());
+        Assertions.assertArrayEquals(buffer, parts.get(0).getBytes());
+    }
+
+    @Test
+    public void static_method_split_shall_return_the_entire_buffer_if_the_start_pattern_is_not_found(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'};
+        byte[] start_pattern = {'0','c'};
+        byte[] end_pattern   = {'i','j'};
+
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, -1);
+
+        // Then:
+        Assertions.assertEquals(1, parts.size());
+        Assertions.assertArrayEquals(buffer, parts.get(0).getBytes());
+    }
+
+    @Test
+    public void static_method_split_shall_return_the_entire_buffer_if_the_end_pattern_is_not_found(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'};
+        byte[] start_pattern = {'b','c'};
+        byte[] end_pattern   = {'z','j'};
+
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, -1);
+
+        // Then:
+        Assertions.assertEquals(1, parts.size());
+        Assertions.assertArrayEquals(buffer, parts.get(0).getBytes());
+    }
+
+    @Test
+    public void static_method_split_shall_return_the_entire_buffer_if_the_end_pattern_is_always_before_the_start_pattern(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','b','c','4','i','j','k','l'};
+        byte[] start_pattern = {'4','i'};
+        byte[] end_pattern   = {'b','c'};
+
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, -1);
+
+        // Then:
+        Assertions.assertEquals(1, parts.size());
+        Assertions.assertArrayEquals(buffer, parts.get(0).getBytes());
+    }
+
+    @Test
+    public void static_method_split_shall_split_properly_a_buffer_when_the_last_part_starts_with_the_given_pattern_but_the_end_pattern_does_not_exist(){
+
+        // Given:
+        byte[] buffer = {'a','b','c','d','b','e','f','g','i','j','0','1','2','b','c','g','h','u','i','j','v','b','c','4','k','l'};
+        byte[] start_pattern = {'b','c'};
+        byte[] end_pattern   = {'i','j'};
+
+        // When:
+        List<ByteArray> parts = ByteArray.s_split(buffer, start_pattern, end_pattern, -1);
+
+        // Then:
+        Assertions.assertEquals(5, parts.size());
+        Assertions.assertArrayEquals(new byte[] {'a'}, parts.get(0).getBytes());
+        Assertions.assertArrayEquals(new byte[] {'b','c','d','b','e','f','g','i','j'}, parts.get(1).getBytes());
+        Assertions.assertArrayEquals(new byte[] {'0','1','2'}, parts.get(2).getBytes());
+        Assertions.assertArrayEquals(new byte[] {'b','c','g','h','u','i','j'}, parts.get(3).getBytes());
+        Assertions.assertArrayEquals(new byte[] {'v','b','c','4','k','l'}, parts.get(4).getBytes());
+    }
 
     // *****************************************************************************************************************
     //
